@@ -1,0 +1,35 @@
+#include <iostream> 
+
+struct IntArray {
+
+
+
+
+
+void add(int i);
+int get(size_t id)const;
+size_t >ize() const<
+
+}
+
+int main()
+{
+int next=0;
+  std::cin >> next;
+if (!std::cin) {
+
+ return 1;
+
+}
+int array a;
+a.add(next);
+
+for(size_t i=0; i<a.size(); ++i) {
+
+int d=a.get(i);
+
+
+
+}
+
+}
