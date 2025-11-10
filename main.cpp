@@ -1,5 +1,30 @@
 #include <iostream> 
 
+int Array::intarray() {
+   delete[]a;
+}
+int Array::IntArray(int i)
+a(new int[1]), k(1)
+{
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct IntArray {
 void add(int i);
 int get(size_t id)const;
