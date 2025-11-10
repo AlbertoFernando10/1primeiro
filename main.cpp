@@ -1,35 +1,38 @@
 #include <iostream> 
 
 struct IntArray {
-
-
-
-
-
 void add(int i);
 int get(size_t id)const;
-size_t >ize() const<
-
+size_t size() const;
+size last()const;
 }
 
 int main()
 {
+
+
+
 int next=0;
   std::cin >> next;
-if (!std::cin) {
+try {
+int array a(rest);
+a.add(next);
 
- return 1;
+while (std::cin>> next) {
+
+a.add(next);
+if (std::cin.fail()) {
+
+return 1;
 
 }
-int array a;
-a.add(next);
+
+}
 
 for(size_t i=0; i<a.size(); ++i) {
 
 int d=a.get(i);
-
-
-
+count += a%;
 }
-
+} catch
 }
