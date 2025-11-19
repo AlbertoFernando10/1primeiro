@@ -1,0 +1,259 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <limits>
+
+using namespace std;
+
+class IntVector {
+    int* elementos;
+    size_t tamanho;
+    size_t capacidade;
+
+    void expandir() {
+        if (capacidade == 0) capacidade = 1;
+        else capacidade *= 2;
+        
+        int* novo = new int[capacidade];
+        for (size_t i = 0; i < tamanho; i++) {
+            novo[i] = elementos[i];
+        }
+        delete[] elementos;
+        elementos = novo;
+    }
+
+public:
+    IntVector() : elementos(nullptr), tamanho(0), capacidade(0) {}
+    
+    IntVector(size_t n) : tamanho(n), capacidade(n) {
+        elementos = new int[capacidade];
+        for (size_t i = 0; i < tamanho; i++) {
+            elementos[i] = 0;
+        }
+    }
+    
+    IntVector(const IntVector& outro) : tamanho(outro.tamanho), capacidade(outro.capacidade) {
+        elementos = new int[capacidade];
+        for (size_t i = 0; i < tamanho; i++) {
+            elementos[i] = outro.elementos[i];
+        }
+    }
+    
+    ~IntVector() {
+        delete[] elementos;
+    }
+    
+    IntVector& operator=(const IntVector& outro) {
+        if (this != &outro) {
+            delete[] elementos;
+            tamanho = outro.tamanho;
+            capacidade = outro.capacidade;
+            elementos = new int[capacidade];
+            for (size_t i = 0; i < tamanho; i++) {
+                elementos[i] = outro.elementos[i];
+            }
+        }
+        return *this;
+    }
+    
+    void adicionar(int valor) {
+        if (tamanho >= capacidade) {
+            expandir();
+        }
+        elementos[tamanho++] = valor;
+    }
+    
+    int& operator[](size_t indice) {
+        return elementos[indice];
+    }
+    
+    const int& operator[](size_t indice) const {
+        return elementos[indice];
+    }
+    
+    size_t obterTamanho() const {
+        return tamanho;
+    }
+};
+
+class IntMatrix {
+    IntVector dados;
+    int linhas;
+    int colunas;
+    
+    size_t calcularIndice(int linha, int coluna) const {
+        return linha * colunas + coluna;
+    }
+
+public:
+    IntMatrix() : linhas(0), colunas(0) {}
+    
+    IntMatrix(int l, int c) : linhas(l), colunas(c) {
+        dados = IntVector(l * c);
+    }
+    
+    int obterLinhas() const { return linhas; }
+    int obterColunas() const { return colunas; }
+    
+    int obterElemento(int linha, int coluna) const {
+        return dados[calcularIndice(linha, coluna)];
+    }
+    
+    void definirElemento(int linha, int coluna, int valor) {
+        dados[calcularIndice(linha, coluna)] = valor;
+    }
+    
+    void exibir() const {
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                cout << obterElemento(i, j);
+                if (j < colunas - 1) cout << " ";
+            }
+            cout << endl;
+        }
+    }
+    
+    int calcularSoma() const {
+        int total = 0;
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                total += obterElemento(i, j);
+            }
+        }
+        return total;
+    }
+    
+    int encontrarMaximo() const {
+        int maximo = obterElemento(0, 0);
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                if (obterElemento(i, j) > maximo) {
+                    maximo = obterElemento(i, j);
+                }
+            }
+        }
+        return maximo;
+    }
+    
+    int encontrarMinimo() const {
+        int minimo = obterElemento(0, 0);
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                if (obterElemento(i, j) < minimo) {
+                    minimo = obterElemento(i, j);
+                }
+            }
+        }
+        return minimo;
+    }
+    
+    void transpor() {
+        IntMatrix transposta(colunas, linhas);
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                transposta.definirElemento(j, i, obterElemento(i, j));
+            }
+        }
+        *this = transposta;
+    }
+    
+    void salvar(const string& nomeArquivo) const {
+        ofstream arquivo(nomeArquivo);
+        if (!arquivo) return;
+        
+        arquivo << linhas << " " << colunas << endl;
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                arquivo << obterElemento(i, j);
+                if (j < colunas - 1) arquivo << " ";
+            }
+            arquivo << endl;
+        }
+    }
+};
+
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        return 1;
+    }
+    
+    ifstream arquivoEntrada(argv[1]);
+    if (!arquivoEntrada) {
+        return 1;
+    }
+    
+    int numLinhas, numColunas;
+    if (!(arquivoEntrada >> numLinhas >> numColunas)) {
+        return 1;
+    }
+    
+    IntMatrix matriz(numLinhas, numColunas);
+    
+    for (int i = 0; i < numLinhas; i++) {
+        for (int j = 0; j < numColunas; j++) {
+            int valor;
+            if (!(arquivoEntrada >> valor)) {
+                return 1;
+            }
+            matriz.definirElemento(i, j, valor);
+        }
+    }
+    
+    int comando;
+    while (cin >> comando) {
+        try {
+            switch (comando) {
+                case 1:
+                    matriz.exibir();
+                    break;
+                    
+                case 2: {
+                    int linha, coluna;
+                    if (!(cin >> linha >> coluna)) return 3;
+                    if (linha < 1 || linha > matriz.obterLinhas() || 
+                        coluna < 1 || coluna > matriz.obterColunas()) {
+                        return 3;
+                    }
+                    cout << matriz.obterElemento(linha - 1, coluna - 1) << endl;
+                    break;
+                }
+                    
+                case 3:
+                    cout << matriz.obterLinhas() << " " << matriz.obterColunas() << endl;
+                    break;
+                    
+                case 4:
+                    cout << matriz.calcularSoma() << endl;
+                    break;
+                    
+                case 5:
+                    cout << matriz.encontrarMaximo() << endl;
+                    break;
+                    
+                case 6:
+                    cout << matriz.encontrarMinimo() << endl;
+                    break;
+                    
+                case 7:
+                    matriz.transpor();
+                    break;
+                    
+                case 8: {
+                    string nomeArquivo;
+                    if (!(cin >> nomeArquivo)) return 3;
+                    matriz.salvar(nomeArquivo);
+                    break;
+                }
+                    
+                default:
+                    return 3;
+            }
+        } catch (bad_alloc&) {
+            return 2;
+        }
+    }
+    
+    return 0;
+}
